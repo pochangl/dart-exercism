@@ -1,11 +1,27 @@
-List<int> primes = [2];
+List<int> primes = [];
+int current = 2;
+
+Map<int, List<int>> progress = {};
+
+void moveon () {
+  for (int prime in progress[current]) {
+    progress[current + prime] = progress.containsKey(current + prime) ? progress[current + prime] : new List<int>();
+    progress[current + prime].add(prime);
+  }
+}
 
 Iterable<int> getPrimes() sync* {
   yield * primes;
-  for (int number = primes[primes.length - 1]; true; number++ ) {
-    if (!primes.any((prime) => number % prime == 0)) {
-      primes.add(number);
-      yield number;
+  while (true) {
+    if (progress.containsKey(current)) {
+      moveon();
+      current ++;
+    } else {
+      primes.add(current);
+      progress[current] = [current];
+      moveon();
+      current ++;
+      yield current - 1;
     }
   }
 }
